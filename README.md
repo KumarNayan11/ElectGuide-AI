@@ -4,6 +4,14 @@ ElectGuide-AI is an AI-powered assistant that helps users understand the Indian 
 
 ---
 
+## Live Demo
+
+ElectGuide-AI is deployed on Google Cloud Run.
+
+https://electguide-ai-1000034027511.asia-south1.run.app/
+
+---
+
 ## Problem Statement
 
 Many citizens lack clear knowledge about election procedures, voter eligibility, and voting preparation. ElectGuide-AI provides an accessible assistant to guide voters through the election process in India.
