@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ElectGuide-AI | Indian Elections Assistant</title>
+    <meta name="description" content="ElectGuide-AI is your interactive web assistant for learning about the Indian election process, voter registration, EVMs, and the Election Commission.">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="brand">
+                <i class="fa-solid fa-check-to-slot"></i>
+                <h1>ElectGuide-AI</h1>
+            </div>
+            <p class="subtitle">Your Election Expert</p>
+            
+            <nav class="suggested-topics">
+                <h3>Quick Topics</h3>
+                <button class="topic-btn" onclick="sendSuggestion('How do elections work in India?')"><i class="fa-solid fa-sitemap"></i> Election Process</button>
+                <button class="topic-btn" onclick="sendSuggestion('How do I register to vote?')"><i class="fa-solid fa-user-plus"></i> Register to Vote</button>
+                <button class="topic-btn" onclick="sendSuggestion('Am I eligible to vote?')"><i class="fa-solid fa-check-circle"></i> Voting Eligibility</button>
+                <button class="topic-btn" onclick="sendSuggestion('What happens on polling day?')"><i class="fa-solid fa-calendar-day"></i> Polling Day Guide</button>
+                <button class="topic-btn" onclick="sendSuggestion('Where is my polling booth?')"><i class="fa-solid fa-map-marker-alt"></i> Polling Booth Finder</button>
+                <button class="topic-btn" onclick="sendSuggestion('How do I find candidates in my constituency?')"><i class="fa-solid fa-users"></i> Candidate Information</button>
+                <button class="topic-btn" onclick="sendSuggestion('Show election timeline')"><i class="fa-solid fa-clock"></i> Election Timeline</button>
+                <button class="topic-btn" onclick="sendSuggestion('fact')"><i class="fa-solid fa-lightbulb"></i> Election Facts</button>
+                <button class="topic-btn" onclick="sendSuggestion('Can someone vote twice?')"><i class="fa-solid fa-balance-scale"></i> Myth vs Fact</button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <span>Built for PromptWars</span>
+                <a href="https://github.com/KumarNayan11/ElectGuide-AI" 
+                   target="_blank" 
+                   rel="noopener"
+                   class="github-link"
+                   title="View Source Code on GitHub">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.58 0-.29-.01-1.06-.02-2.08-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.08 1.83 1.23 1.83 1.23 1.07 1.84 2.81 1.31 3.49 1 .11-.78.42-1.31.76-1.61-2.67-.3-5.47-1.34-5.47-5.93 0-1.31.47-2.38 1.23-3.22-.12-.3-.53-1.52.12-3.17 0 0 1.01-.32 3.3 1.23.96-.27 1.98-.4 3-.4 1.02 0 2.04.13 3 .4 2.29-1.55 3.3-1.23 3.3-1.23.65 1.65.24 2.87.12 3.17.77.84 1.23 1.91 1.23 3.22 0 4.61-2.81 5.62-5.49 5.92.43.37.81 1.1.81 2.22 0 1.6-.01 2.89-.01 3.28 0 .32.21.7.82.58C20.56 21.8 24 17.3 24 12 24 5.37 18.63 0 12 0z"/>
+                    </svg>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-main">
+            <header class="chat-header">
+                <div class="header-info">
+                    <h2><i class="fa-solid fa-robot"></i> Chat Assistant</h2>
+                    <span class="status"><span class="dot"></span> Online</span>
+                </div>
+            </header>
+
+            <div class="chat-box" id="chat-box">
+                <div class="message bot-message slide-in" id="welcome-message">
+                    <div class="avatar"><i class="fa-solid fa-robot"></i></div>
+                    <div class="message-content">
+                        Welcome to ElectGuide-AI — your assistant for understanding the Indian election process. Type 'demo' to explore features.
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-input-container">
+                <div class="example-prompts" id="suggestion-chips">
+                    <!-- Suggestions will be generated here -->
+                </div>
+                <form id="chat-form">
+                    <input type="text" id="user-input" placeholder="Type your election query here..." autocomplete="off" required>
+                    <button type="submit" id="send-btn"><i class="fa-solid fa-paper-plane"></i></button>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

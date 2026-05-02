@@ -1,0 +1,136 @@
+{
+    "election_process": {
+        "title": "Indian Election Process Steps",
+        "type": "steps",
+        "data": [
+            "Election Commission announces elections",
+            "Candidate nominations are filed",
+            "Campaign period begins",
+            "Polling day occurs",
+            "Votes are counted",
+            "Results are declared"
+        ]
+    },
+    "voting_steps": {
+        "title": "Voting Day Procedure",
+        "type": "steps",
+        "data": [
+            "Check your name in the voter list",
+            "Carry voter ID or approved ID proof",
+            "Visit assigned polling booth",
+            "Verify identity with polling officer",
+            "Cast vote using EVM",
+            "Receive ink mark confirmation"
+        ]
+    },
+    "timeline": {
+        "title": "Election Timeline",
+        "type": "steps",
+        "data": [
+            "Election announcement",
+            "Model Code of Conduct begins",
+            "Candidate nominations",
+            "Campaigning period",
+            "Polling day",
+            "Counting of votes"
+        ]
+    },
+    "eligibility_rules": {
+        "title": "Voter Eligibility Rules",
+        "type": "steps",
+        "data": [
+            "Must be an Indian citizen",
+            "Must be 18 years or older",
+            "Must be registered in the electoral roll"
+        ]
+    },
+    "voter_registration": [
+        "Visit the NVSP portal or voter service center",
+        "Fill Form 6 for new voter registration",
+        "Provide identity and address proof",
+        "Submit the application",
+        "Verification by election officer",
+        "Name added to electoral roll"
+    ],
+    "evm_explanation": [
+        "Electronic Voting Machines (EVM) are used for voting in Indian elections",
+        "Voters press a button next to their chosen candidate",
+        "The machine records the vote electronically",
+        "A VVPAT slip briefly displays the chosen candidate",
+        "The slip is stored securely for audit verification"
+    ],
+    "voting_preparation": {
+        "title": "How to Prepare for Voting",
+        "type": "steps",
+        "data": [
+            "Check your name in the electoral roll",
+            "Confirm your polling booth location",
+            "Carry voter ID or an approved identity document",
+            "Reach the polling station during voting hours",
+            "Follow instructions of polling officers"
+        ]
+    },
+    "polling_day_process": {
+        "title": "Polling Day Process",
+        "type": "steps",
+        "data": [
+            "Enter polling station and join the queue",
+            "Polling officer verifies your identity",
+            "Your finger is marked with indelible ink",
+            "You proceed to the voting compartment",
+            "Press the button for your chosen candidate on the EVM",
+            "VVPAT briefly displays your vote confirmation"
+        ]
+    },
+    "faq": {
+        "who_conducts_elections": "The Election Commission of India conducts national and state elections.",
+        "can_i_vote_without_voter_id": "Yes, alternative approved identity documents may be accepted at polling stations.",
+        "can_i_vote_twice": "No. Each registered voter can vote only once in an election.",
+        "what_is_nota": "NOTA stands for 'None of the Above'. It is an option on the voting machine that allows voters to reject all candidates in their constituency.",
+        "role_of_election_commission": "The Election Commission of India is an autonomous constitutional authority responsible for administering election processes, ensuring free and fair elections.",
+        "what_is_vvpat": "VVPAT (Voter Verifiable Paper Audit Trail) is a system attached to the EVM that prints a paper slip displaying the voter's choice, allowing them to verify their vote.",
+        "how_are_votes_counted": "Votes are counted electronically from the EVMs under high security, in the presence of returning officers and candidate representatives."
+    },
+    "election_timeline_detailed": [
+        "Election Commission announces the election schedule",
+        "Model Code of Conduct comes into effect",
+        "Candidate nominations are filed",
+        "Scrutiny of nomination papers",
+        "Campaigning period",
+        "Polling day",
+        "Counting of votes",
+        "Declaration of results"
+    ],
+    "polling_booth_guidance": [
+        "Check your polling booth location on the Election Commission website or NVSP portal",
+        "Enter your voter ID or personal details",
+        "Locate the assigned polling station",
+        "Note the address and polling time",
+        "Carry your voter ID or an approved identity document when visiting the booth"
+    ],
+    "polling_booth_finder": [
+        "Visit the NVSP portal or Election Commission website",
+        "Enter your voter ID or personal details",
+        "Locate your assigned polling station",
+        "Note the polling booth address and voting time",
+        "Carry valid ID when visiting the booth"
+    ],
+    "candidate_info": [
+        "Candidate information is available on the Election Commission website",
+        "Search by constituency name",
+        "Review candidate profiles and affidavits",
+        "Compare candidate backgrounds before voting"
+    ],
+    "election_facts": [
+        "India has the largest democratic electorate in the world, with over 970 million registered voters.",
+        "The Indian general election is conducted in multiple phases spread across several weeks.",
+        "EVMs (Electronic Voting Machines) have been used in Indian elections since 1982.",
+        "The Model Code of Conduct prohibits political parties from making new policy announcements during election campaigns.",
+        "The Election Commission of India was established on January 25, 1950 — one day before the Republic.",
+        "India uses a first-past-the-post (FPTP) voting system for Lok Sabha elections.",
+        "NOTA (None of the Above) was introduced in Indian elections in 2013.",
+        "Indelible ink used in Indian elections was first used in the 1962 general election.",
+        "Indian voters as young as 18 years old have the right to vote since the 61st Constitutional Amendment of 1989.",
+        "The Election Commission can postpone or cancel polls in a constituency if law and order cannot be maintained."
+    ]
+}

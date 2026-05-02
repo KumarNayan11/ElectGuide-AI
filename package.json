@@ -1,0 +1,27 @@
+{
+  "name": "electguide-ai",
+  "version": "1.0.0",
+  "description": "ElectGuide-AI is an interactive web assistant developed for Election Process Education (Challenge 2, Virtual: PromptWars by Google/H2S)",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node tests/intent.test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KumarNayan11/ElectGuide-AI.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/KumarNayan11/ElectGuide-AI/issues"
+  },
+  "homepage": "https://github.com/KumarNayan11/ElectGuide-AI#readme",
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1"
+  }
+}
