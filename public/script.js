@@ -109,7 +109,7 @@ async function appendMessage(sender, text) {
         contentDiv.innerHTML = formattedText;
     }
     
-    scrollToBottom();
+    autoScroll();
 }
 
 async function typeWriterEffect(element, htmlString) {
@@ -124,7 +124,7 @@ async function typeWriterEffect(element, htmlString) {
             parent.appendChild(textNode);
             for (let i = 0; i < text.length; i++) {
                 textNode.textContent += text.charAt(i);
-                scrollToBottom();
+                autoScroll();
                 await new Promise(r => setTimeout(r, 15));
             }
         } else if (node.nodeType === Node.ELEMENT_NODE) {
@@ -157,7 +157,7 @@ function showTypingIndicator() {
     `;
 
     chatBox.appendChild(typingDiv);
-    scrollToBottom();
+    autoScroll();
     return id;
 }
 
@@ -168,8 +168,13 @@ function removeElement(id) {
     }
 }
 
-function scrollToBottom() {
-    chatBox.scrollTop = chatBox.scrollHeight;
+function autoScroll() {
+    const threshold = 100;
+    const isNearBottom =
+        chatBox.scrollHeight - chatBox.scrollTop - chatBox.clientHeight < threshold;
+    if (isNearBottom) {
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
 }
 
 // Function called by quick topic buttons in the sidebar
