@@ -25,27 +25,32 @@ Many citizens lack clear knowledge about election procedures, voter eligibility,
 
 ## Screenshots
 
-### 1. Main Interface
-
-> *The main chat interface with the dark sidebar, suggestion prompts, and topic navigation.*
-
-![Main Interface](docs/screenshots/main-interface.png)
-
----
-
-### 2. Quick Mode
-
-> *`/quick` mode returns a concise, straight-to-the-point answer for fast lookups.*
-
-![Quick Mode](docs/screenshots/quick-mode.png)
-
----
-
-### 3. Detail Mode
-
-> *`/detail` mode returns an expanded, step-by-step explanation for deeper understanding.*
-
-![Detail Mode](docs/screenshots/detail-mode.png)
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <b>1. Main Interface</b><br/>
+      <sub>Dark sidebar, suggestion prompts &amp; topic navigation</sub><br/><br/>
+      <img src="docs/screenshots/main-interface.png" width="380" alt="Main Interface"/>
+    </td>
+    <td align="center" width="50%">
+      <b>2. Quick Mode</b><br/>
+      <sub><code>/quick</code> — concise, straight-to-the-point answers</sub><br/><br/>
+      <img src="docs/screenshots/quick-mode.png" width="380" alt="Quick Mode"/>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <b>3. Detail Mode</b><br/>
+      <sub><code>/detail</code> — expanded, step-by-step explanations</sub><br/><br/>
+      <img src="docs/screenshots/detail-mode.png" width="380" alt="Detail Mode"/>
+    </td>
+    <td align="center" width="50%">
+      <b>4. Firestore Analytics</b><br/>
+      <sub>Query logs with mode, source &amp; timestamp</sub><br/><br/>
+      <img src="docs/screenshots/firestore-analytics.png" width="380" alt="Firestore Analytics"/>
+    </td>
+  </tr>
+</table>
 
 ---
 
