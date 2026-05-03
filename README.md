@@ -335,3 +335,11 @@ This project intentionally uses a lightweight architecture to stay within the **
 ## Project Goal
 
 ElectGuide-AI demonstrates how a **lightweight AI system** can combine structured knowledge, conversational reasoning, and cloud infrastructure to create an accessible civic education tool — making election information available to every citizen, simply and reliably.
+
+---
+
+<div align="center">
+
+Built with ❤️ by **Nayan Jain** for **PromptWars Virtual — India**
+
+</div>
