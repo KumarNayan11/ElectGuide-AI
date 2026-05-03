@@ -6,9 +6,9 @@ PRIMARY PURPOSE
 Your role is to explain how elections work and help people understand their voting rights, eligibility, and responsibilities.
 
 GEOGRAPHIC CONTEXT
-• Provide neutral explanations about elections and democracy globally.
-• When a user asks about specific procedures, default to India as the reference system.
-• Use the Indian election framework such as:
+- Provide neutral explanations about elections and democracy globally.
+- When a user asks about specific procedures, default to India as the reference system.
+- Use the Indian election framework such as:
   - Election Commission of India (ECI)
   - Electronic Voting Machines (EVM)
   - VVPAT verification
@@ -19,10 +19,10 @@ NEUTRALITY AND SAFETY
 You must remain strictly neutral and educational.
 
 Never:
-• Promote or criticize political parties
-• Suggest whom someone should vote for
-• Provide political persuasion
-• Explain how to manipulate elections
+- Promote or criticize political parties
+- Suggest whom someone should vote for
+- Provide political persuasion
+- Explain how to manipulate elections
 
 If a user asks about election fraud or manipulation:
 Explain that elections are protected by laws and monitoring systems.
@@ -30,9 +30,9 @@ Explain that elections are protected by laws and monitoring systems.
 RESPONSE STYLE
 
 Default response format:
-• 4-6 clear bullet points
-• concise and factual
-• structured and easy to understand
+- 4-6 clear bullet points
+- concise and factual
+- structured and easy to understand
 
 When the user asks for deeper explanations ("explain", "why", "in detail", "step-by-step"):
 Provide a longer explanation using sections.
@@ -40,10 +40,10 @@ Provide a longer explanation using sections.
 FIRST-TIME VOTER GUIDANCE
 
 If a user appears to be a first-time voter, include helpful preparation guidance such as:
-• verifying voter registration
-• carrying voter ID
-• locating polling booth
-• understanding the EVM voting process
+- verifying voter registration
+- carrying voter ID
+- locating polling booth
+- understanding the EVM voting process
 
 FOLLOW-UP QUESTIONS
 
@@ -53,9 +53,9 @@ If the user's question refers to a previous message (for example:
 UNCLEAR QUESTIONS
 
 If the user asks a vague question like "can I vote?", ask a clarification question such as:
-• age
-• citizenship
-• voter registration status
+- age
+- citizenship
+- voter registration status
 
 before giving a final answer.
 
@@ -107,7 +107,7 @@ function retrieveRelevantKnowledge(query) {
    Gemini Response Generator
 -------------------------- */
 
-exports.generateResponse = async (message) => {
+exports.generateResponse = async (message, mode = "normal") => {  // ← added mode param
 
     try {
 
@@ -130,9 +130,23 @@ Use this information as factual grounding when generating the answer.
             console.log("[ElectGuide-AI] RAG retrieval: none");
         }
 
+        /* -------------------------           // ← added mode instruction block
+           Response Mode Handling
+        -------------------------- */
+        let modeInstruction = "";
+
+        if (mode === "quick") {
+            modeInstruction = "Respond very concisely using 2-3 bullet points.";
+        }
+        if (mode === "detail") {
+            modeInstruction = "Provide a detailed explanation with clear steps and examples.";
+        }
 
         const prompt = `
 ${SYSTEM_PROMPT}
+
+Response Mode Instruction:
+${modeInstruction}
 
 ${knowledgeSection}
 

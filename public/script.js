@@ -1,36 +1,104 @@
-const chatForm = document.getElementById('chat-form');
-const userInput = document.getElementById('user-input');
-const chatBox = document.getElementById('chat-box');
-const sendBtn = document.getElementById('send-btn');
+'use strict';
 
-chatForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const message = userInput.value.trim();
-    if (!message) return;
+/* =========================================================
+   DOM references
+   ========================================================= */
+const chatForm   = document.getElementById('chat-form');
+const userInput  = document.getElementById('user-input');
+const chatBox    = document.getElementById('chat-box');
+const sendBtn    = document.getElementById('send-btn');
+const modeHint   = document.getElementById('mode-hint');
+const modePill   = document.getElementById('mode-pill');
+const menuToggle = document.getElementById('menu-toggle');
+const sidebar    = document.querySelector('.sidebar');
 
-    // Add user message to chat
-    await appendMessage('user', message);
+/* =========================================================
+   Mode state  ("normal" | "quick" | "detail")
+   ========================================================= */
+let activeMode = 'normal';
+
+function setMode(mode) {
+    if (activeMode === mode) {
+        // Toggle off — go back to normal
+        activeMode = 'normal';
+    } else {
+        activeMode = mode;
+    }
+
+    // Update button styles
+    document.getElementById('btn-quick').classList.toggle('active', activeMode === 'quick');
+    document.getElementById('btn-detail').classList.toggle('active', activeMode === 'detail');
+
+    // Update mode pill + hint
+    if (activeMode === 'quick') {
+        modePill.textContent = '⚡ Quick Mode';
+        modePill.hidden = false;
+        modeHint.textContent = 'Quick mode — concise answers only.';
+    } else if (activeMode === 'detail') {
+        modePill.textContent = '📖 Detail Mode';
+        modePill.hidden = false;
+        modeHint.textContent = 'Detail mode — in-depth explanations.';
+    } else {
+        modePill.hidden = true;
+        modeHint.textContent = '';
+    }
+
+    userInput.focus();
+}
+
+/* =========================================================
+   Mobile sidebar toggle
+   ========================================================= */
+if (menuToggle && sidebar) {
+    menuToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+    });
+
+    // Close sidebar when clicking outside
+    document.addEventListener('click', (e) => {
+        if (sidebar.classList.contains('open') &&
+            !sidebar.contains(e.target) &&
+            e.target !== menuToggle) {
+            sidebar.classList.remove('open');
+        }
+    });
+}
+
+/* =========================================================
+   Send logic — single function used by form, Enter key,
+   and suggestion buttons
+   ========================================================= */
+async function sendMessage() {
+    const rawMessage = userInput.value.trim();
+    if (!rawMessage) return;
+
+    // Guard: ignore if a request is already in flight
+    if (sendBtn.disabled) return;
+
+    // Prefix based on active mode
+    let messageToSend = rawMessage;
+    if (activeMode === 'quick')  messageToSend = `/quick ${rawMessage}`;
+    if (activeMode === 'detail') messageToSend = `/detail ${rawMessage}`;
+
+    // Show user bubble with the raw (un-prefixed) text
+    appendMessage('user', rawMessage);
     userInput.value = '';
-    
-    // Disable input while processing
-    userInput.disabled = true;
-    sendBtn.disabled = true;
 
-    // Show typing indicator
+    // Lock UI
+    userInput.disabled = true;
+    sendBtn.disabled   = true;
+
+    // Typing indicator
     const typingId = showTypingIndicator();
 
     try {
         const response = await fetch('/api/chat', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ message })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: messageToSend })
         });
 
         const data = await response.json();
-        
-        // Remove typing indicator
         removeElement(typingId);
 
         if (response.ok) {
@@ -38,24 +106,42 @@ chatForm.addEventListener('submit', async (e) => {
         } else {
             await appendMessage('bot', data.error || 'An error occurred.');
         }
+
         rotateSuggestions();
-    } catch (error) {
+
+    } catch {
         removeElement(typingId);
-        appendMessage('bot', 'Sorry, I am unable to connect to the server right now.');
+        await appendMessage('bot', 'Sorry, I am unable to connect to the server right now.');
     } finally {
-        // Re-enable input
         userInput.disabled = false;
-        sendBtn.disabled = false;
+        sendBtn.disabled   = false;
         userInput.focus();
+    }
+}
+
+// Form submit (click send button)
+chatForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    sendMessage();
+});
+
+// Enter to send, Shift+Enter for new line
+userInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
     }
 });
 
+/* =========================================================
+   Append a message bubble
+   ========================================================= */
 async function appendMessage(sender, text) {
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message', `${sender}-message`, 'slide-in');
 
     const iconClass = sender === 'user' ? 'fa-user' : 'fa-robot';
-    
+
     let formattedText = '';
 
     if (typeof text === 'object' && text !== null) {
@@ -64,7 +150,7 @@ async function appendMessage(sender, text) {
                 <div class="structured-response">
                     <h3 class="structured-title">${text.title}</h3>
                     <div class="steps-container">
-                        ${text.data.map((step) => `
+                        ${text.data.map(step => `
                             <div class="step-card">
                                 <div class="step-icon">&#10003;</div>
                                 <div class="step-content">${step}</div>
@@ -78,7 +164,7 @@ async function appendMessage(sender, text) {
                 <div class="structured-response">
                     <h3 class="structured-title">${text.title}</h3>
                     <div class="timeline-container">
-                        ${text.data.map((step) => `
+                        ${text.data.map(step => `
                             <div class="timeline-item">
                                 <div class="timeline-content">${step}</div>
                             </div>
@@ -88,35 +174,43 @@ async function appendMessage(sender, text) {
             `;
         }
     } else {
-        // Simple basic markdown support (bolding and line breaks)
+        // Basic markdown: bold, italic, line breaks
         formattedText = String(text)
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\n/g, '<br>');
+            .replace(/\*(.*?)\*/g,     '<em>$1</em>')
+            .replace(/\n/g,            '<br>');
     }
 
     messageDiv.innerHTML = `
-        <div class="avatar"><i class="fa-solid ${iconClass}"></i></div>
+        ${
+            sender === 'bot'
+                ? `<div class="bot-avatar"><i class="fa-solid fa-robot"></i></div>`
+                : `<div class="avatar"><i class="fa-solid fa-user"></i></div>`
+        }
         <div class="message-content"></div>
     `;
 
     chatBox.appendChild(messageDiv);
-    
+
     const contentDiv = messageDiv.querySelector('.message-content');
-    
+
     if (sender === 'bot') {
         await typeWriterEffect(contentDiv, formattedText);
     } else {
         contentDiv.innerHTML = formattedText;
     }
-    
+
     autoScroll();
 }
 
+/* =========================================================
+   Typewriter effect for bot messages
+   ========================================================= */
 async function typeWriterEffect(element, htmlString) {
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = htmlString;
     element.innerHTML = '';
-    
+
     async function typeNode(node, parent) {
         if (node.nodeType === Node.TEXT_NODE) {
             const text = node.textContent;
@@ -125,7 +219,7 @@ async function typeWriterEffect(element, htmlString) {
             for (let i = 0; i < text.length; i++) {
                 textNode.textContent += text.charAt(i);
                 autoScroll();
-                await new Promise(r => setTimeout(r, 15));
+                await new Promise(r => setTimeout(r, 14));
             }
         } else if (node.nodeType === Node.ELEMENT_NODE) {
             const clone = node.cloneNode(false);
@@ -135,12 +229,15 @@ async function typeWriterEffect(element, htmlString) {
             }
         }
     }
-    
+
     for (const node of Array.from(tempDiv.childNodes)) {
         await typeNode(node, element);
     }
 }
 
+/* =========================================================
+   Typing indicator
+   ========================================================= */
 function showTypingIndicator() {
     const id = 'typing-' + Date.now();
     const typingDiv = document.createElement('div');
@@ -148,67 +245,73 @@ function showTypingIndicator() {
     typingDiv.id = id;
 
     typingDiv.innerHTML = `
-        <div class="avatar"><i class="fa-solid fa-robot"></i></div>
+        <div class="bot-avatar"><i class="fa-solid fa-robot"></i></div>
         <div class="message-content typing-indicator">
             <span class="typing-dot"></span>
             <span class="typing-dot"></span>
             <span class="typing-dot"></span>
+            <span class="typing-label">ElectGuide AI is thinking…</span>
         </div>
     `;
 
     chatBox.appendChild(typingDiv);
-    autoScroll();
+    chatBox.scrollTop = chatBox.scrollHeight;
     return id;
 }
 
+/* =========================================================
+   Helpers
+   ========================================================= */
 function removeElement(id) {
-    const element = document.getElementById(id);
-    if (element) {
-        element.remove();
-    }
+    const el = document.getElementById(id);
+    if (el) el.remove();
 }
 
 function autoScroll() {
-    const threshold = 100;
-    const isNearBottom =
-        chatBox.scrollHeight - chatBox.scrollTop - chatBox.clientHeight < threshold;
-    if (isNearBottom) {
-        chatBox.scrollTop = chatBox.scrollHeight;
-    }
+    chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// Function called by quick topic buttons in the sidebar
+/* =========================================================
+   Suggestion chips (above the input box)
+   ========================================================= */
+
+// Sends message directly (not just autofill) — used by sidebar topic buttons
 function sendSuggestion(text) {
     userInput.value = text;
-    // Programmatically submit the form
     chatForm.dispatchEvent(new Event('submit', { cancelable: true }));
 }
 
+// Autofills the input (used by chips above input box)
 function autofillSuggestion(text) {
     userInput.value = text;
     userInput.focus();
 }
 
 const suggestionsList = [
-    "How do elections work in India?",
-    "How do I register to vote?",
-    "What happens on polling day?",
-    "Am I eligible to vote?",
-    "Where is my polling booth?"
+    'How do elections work in India?',
+    'How do I register to vote?',
+    'What happens on polling day?',
+    'Am I eligible to vote?',
+    'Where is my polling booth?',
+    'How does EVM work?',
+    'What is Model Code of Conduct?'
 ];
 
 function rotateSuggestions() {
     const container = document.getElementById('suggestion-chips');
     if (!container) return;
-    
+
     const shuffled = [...suggestionsList].sort(() => 0.5 - Math.random());
-    const selected = shuffled.slice(0, 3);
-    
-    container.innerHTML = selected.map(s => 
-        `<button class="example-prompt-btn" onclick="autofillSuggestion('${s}')">"${s}"</button>`
-    ).join('');
+    const selected = shuffled.slice(0, 4);
+
+    container.innerHTML = selected
+        .map(s => `<button class="example-prompt-btn" onclick="sendSuggestion('${s.replace(/'/g, "\\'")}')">✦ ${s}</button>`)
+        .join('');
 }
 
+/* =========================================================
+   Init
+   ========================================================= */
 window.addEventListener('DOMContentLoaded', () => {
     rotateSuggestions();
 });

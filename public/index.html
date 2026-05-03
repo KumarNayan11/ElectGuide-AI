@@ -11,6 +11,7 @@
 </head>
 <body>
     <div class="app-container">
+
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="brand">
@@ -18,7 +19,7 @@
                 <h1>ElectGuide-AI</h1>
             </div>
             <p class="subtitle">Your Election Expert</p>
-            
+
             <nav class="suggested-topics">
                 <h3>Quick Topics</h3>
                 <button class="topic-btn" onclick="sendSuggestion('How do elections work in India?')"><i class="fa-solid fa-sitemap"></i> Election Process</button>
@@ -34,8 +35,8 @@
 
             <div class="sidebar-footer">
                 <span>Built for PromptWars</span>
-                <a href="https://github.com/KumarNayan11/ElectGuide-AI" 
-                   target="_blank" 
+                <a href="https://github.com/KumarNayan11/ElectGuide-AI"
+                   target="_blank"
                    rel="noopener"
                    class="github-link"
                    title="View Source Code on GitHub">
@@ -53,25 +54,56 @@
                     <h2><i class="fa-solid fa-robot"></i> Chat Assistant</h2>
                     <span class="status"><span class="dot"></span> Online</span>
                 </div>
+                <!-- Mobile sidebar toggle -->
+                <button class="menu-toggle" id="menu-toggle" aria-label="Toggle sidebar">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
             </header>
 
             <div class="chat-box" id="chat-box">
                 <div class="message bot-message slide-in" id="welcome-message">
                     <div class="avatar"><i class="fa-solid fa-robot"></i></div>
                     <div class="message-content">
-                        Welcome to ElectGuide-AI — your assistant for understanding the Indian election process. Type 'demo' to explore features.
+                        Welcome to <strong>ElectGuide-AI</strong> — your assistant for understanding the Indian election process. Type <em>'demo'</em> to explore features, or choose a topic from the sidebar.
                     </div>
                 </div>
             </div>
 
+            <!-- Input area -->
             <div class="chat-input-container">
-                <div class="example-prompts" id="suggestion-chips">
-                    <!-- Suggestions will be generated here -->
+
+                <!-- Suggestion chips -->
+                <div class="example-prompts" id="suggestion-chips"></div>
+
+                <!-- Active mode pill -->
+                <span class="mode-pill" id="mode-pill" hidden></span>
+
+                <!-- Mode toggles + form row -->
+                <div class="input-row">
+                    <div class="mode-controls">
+                        <button class="mode-btn" id="btn-quick" title="Get a brief answer" onclick="setMode('quick')">
+                            <i class="fa-solid fa-bolt"></i> Quick
+                        </button>
+                        <button class="mode-btn" id="btn-detail" title="Get a detailed explanation" onclick="setMode('detail')">
+                            <i class="fa-solid fa-book-open"></i> Detail
+                        </button>
+                    </div>
+
+                    <form id="chat-form">
+                        <input
+                            type="text"
+                            id="user-input"
+                            placeholder="Ask about elections, voting, or voter eligibility…"
+                            autocomplete="off"
+                            required
+                        >
+                        <button type="submit" id="send-btn" aria-label="Send message">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </form>
                 </div>
-                <form id="chat-form">
-                    <input type="text" id="user-input" placeholder="Type your election query here..." autocomplete="off" required>
-                    <button type="submit" id="send-btn"><i class="fa-solid fa-paper-plane"></i></button>
-                </form>
+
+                <p class="mode-hint" id="mode-hint"></p>
             </div>
         </main>
     </div>

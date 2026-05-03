@@ -1,5 +1,6 @@
 const intentService = require('../services/intent.service');
 const geminiService = require('../services/gemini.service');
+const analyticsService = require('../services/analytics.service');
 
 // Store last 2 conversation turns
 let conversationContext = [];
@@ -21,7 +22,24 @@ exports.handleChat = async (req, res) => {
             return res.status(400).json({ error: 'Message is required' });
         }
 
-        const userMessage = message.trim();
+        /* ---------------------------
+           Detect response mode
+        --------------------------- */
+
+        let mode = "normal";
+        let cleanMessage = message.trim();
+
+        if (cleanMessage.startsWith("/quick")) {
+            mode = "quick";
+            cleanMessage = cleanMessage.replace("/quick", "").trim();
+        }
+
+        if (cleanMessage.startsWith("/detail")) {
+            mode = "detail";
+            cleanMessage = cleanMessage.replace("/detail", "").trim();
+        }
+
+        const userMessage = cleanMessage;
 
         /* ----------------------------------
            1. Follow-up detection
@@ -33,7 +51,7 @@ exports.handleChat = async (req, res) => {
                 `Previous conversation:\n${conversationContext.join('\n')}\n\n` +
                 `User follow-up question: ${userMessage}`;
 
-            const geminiResponse = await geminiService.generateResponse(contextualPrompt);
+            const geminiResponse = await geminiService.generateResponse(contextualPrompt, mode);
 
             conversationContext.push(`User: ${userMessage}`);
             conversationContext.push(`Assistant: ${geminiResponse}`);
@@ -43,6 +61,8 @@ exports.handleChat = async (req, res) => {
             }
 
             console.log(`[ElectGuide-AI] query="${userMessage}" | followup=true | topic=${lastTopic || 'unknown'} | source=gemini`);
+
+            await analyticsService.logQuery(userMessage, mode, 'gemini');
 
             return res.json({ reply: geminiResponse, source: 'gemini' });
         }
@@ -60,7 +80,6 @@ exports.handleChat = async (req, res) => {
                     ? intentResponse
                     : `[Structured Response: ${intentResponse.title || 'Data'}]`;
 
-            // Update topic context
             lastTopic = typeof intentResponse === 'object'
                 ? intentResponse.title
                 : 'general-election-topic';
@@ -75,6 +94,8 @@ exports.handleChat = async (req, res) => {
             console.log(
                 `[ElectGuide-AI] query="${userMessage}" | intent=${lastTopic} | source=knowledge`
             );
+
+            await analyticsService.logQuery(userMessage, mode, 'intent');
 
             return res.json({
                 reply: intentResponse,
@@ -94,7 +115,7 @@ exports.handleChat = async (req, res) => {
                 `User Question: ${userMessage}`;
         }
 
-        const geminiResponse = await geminiService.generateResponse(promptWithContext);
+        const geminiResponse = await geminiService.generateResponse(promptWithContext, mode);
 
         conversationContext.push(`User: ${userMessage}`);
         conversationContext.push(`Assistant: ${geminiResponse}`);
@@ -104,6 +125,8 @@ exports.handleChat = async (req, res) => {
         }
 
         console.log(`[ElectGuide-AI] query="${userMessage}" | intent=none | source=gemini`);
+
+        await analyticsService.logQuery(userMessage, mode, 'gemini');
 
         return res.json({
             reply: geminiResponse,
