@@ -54,14 +54,6 @@ Many citizens lack clear knowledge about election procedures, voter eligibility,
 
 ---
 
-### 4. Firestore Analytics
-
-> *Interaction logs captured in Firestore, showing query, mode, source, and timestamp fields.*
-
-![Firestore Analytics](docs/screenshots/firestore-analytics.png)
-
----
-
 ## Features
 
 | Feature | Description |
