@@ -2,8 +2,9 @@
 
 const { Firestore } = require('@google-cloud/firestore');
 
-// Initialize Firestore using default credentials (Cloud Run service account)
-const firestore = new Firestore();
+const firestore = new Firestore({
+    projectId: process.env.GOOGLE_CLOUD_PROJECT || 'electguide-ai'
+});
 
 const COLLECTION = 'electguide_queries';
 
