@@ -1,20 +1,59 @@
 # ElectGuide-AI
 
-ElectGuide-AI is an AI-powered assistant that helps users understand the Indian election process, voting steps, timelines, and voter eligibility through an interactive chat interface.
+> An AI-powered civic assistant that helps citizens understand the Indian election process, voting eligibility, and polling procedures through an interactive conversational interface.
+
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Cloud%20Run-blue?logo=googlecloud)](https://electguide-ai-1000034027511.asia-south1.run.app/)
+[![Node.js](https://img.shields.io/badge/Node.js-Express-green?logo=nodedotjs)](https://nodejs.org/)
+[![Gemini](https://img.shields.io/badge/AI-Gemini%202.5%20Flash-orange?logo=google)](https://ai.google.dev/)
+[![Cloud Run](https://img.shields.io/badge/Deploy-Cloud%20Run-blue?logo=googlecloud)](https://cloud.google.com/run)
 
 ---
 
 ## Live Demo
 
-ElectGuide-AI is deployed on Google Cloud Run.
+ElectGuide-AI is deployed on Google Cloud Run and is publicly accessible:
 
-https://electguide-ai-1000034027511.asia-south1.run.app/
+🔗 **https://electguide-ai-1000034027511.asia-south1.run.app/**
 
 ---
 
 ## Problem Statement
 
-Many citizens lack clear knowledge about election procedures, voter eligibility, and voting preparation. ElectGuide-AI provides an accessible assistant to guide voters through the election process in India.
+Many citizens lack clear knowledge about election procedures, voter eligibility, and voting preparation. ElectGuide-AI addresses this gap by providing an accessible assistant that explains the election process, guides voters through preparation steps, and answers common election-related questions — all through a simple chat interface.
+
+---
+
+## Screenshots
+
+### 1. Main Interface
+
+> *The main chat interface with the dark sidebar, suggestion prompts, and topic navigation.*
+
+![Main Interface](docs/screenshots/main-interface.png)
+
+---
+
+### 2. Quick Mode
+
+> *`/quick` mode returns a concise, straight-to-the-point answer for fast lookups.*
+
+![Quick Mode](docs/screenshots/quick-mode.png)
+
+---
+
+### 3. Detail Mode
+
+> *`/detail` mode returns an expanded, step-by-step explanation for deeper understanding.*
+
+![Detail Mode](docs/screenshots/detail-mode.png)
+
+---
+
+### 4. Firestore Analytics
+
+> *Interaction logs captured in Firestore, showing query, mode, source, and timestamp fields.*
+
+![Firestore Analytics](docs/screenshots/firestore-analytics.png)
 
 ---
 
@@ -22,50 +61,86 @@ Many citizens lack clear knowledge about election procedures, voter eligibility,
 
 | Feature | Description |
 |---|---|
-| Election Process Guide | Step-by-step walkthrough of how Indian elections work |
-| Voting Preparation Guide | Pre-polling checklist for first-time voters |
-| Polling Day Explanation | What to expect when you arrive at the booth |
-| Voter Eligibility Checker | Checks age, citizenship, and registration status |
-| Polling Booth Finder Guidance | Guidance on how to locate your assigned booth |
-| Candidate Information Lookup | How to research candidates in your constituency |
-| Election Timeline Visualization | Visual timeline of election stages |
-| Election FAQ Responses | Covers NOTA, EVMs, VVPAT, MCC, and more |
-| Election Facts Generator | Random election facts from the knowledge base |
-| Myth vs Fact Election Education | Corrects common election misconceptions |
-| Intent-based response engine | Instant deterministic responses for fast answers |
-| Gemini AI fallback | Handles complex queries not covered by the intent engine |
-| Context-aware conversation memory | Maintains last 2 exchanges for follow-up queries |
-| Modern lightweight chat UI | Dark sidebar, animated messages, suggestion prompts |
+| **Election Process Guide** | Step-by-step walkthrough of how Indian elections work |
+| **Voting Preparation Guide** | Pre-polling checklist for first-time voters |
+| **Polling Day Explanation** | What to expect when you arrive at the booth |
+| **Voter Eligibility Checker** | Checks age, citizenship, and registration status |
+| **Polling Booth Finder Guidance** | Explains how to locate your assigned polling station |
+| **Candidate Information Lookup** | Guides users on how to research candidates in their constituency |
+| **Election Timeline Visualization** | Visual breakdown of each stage of an election |
+| **Election FAQ Responses** | Covers NOTA, EVMs, VVPAT, MCC, vote counting, and more |
+| **Election Facts Generator** | Provides educational facts about Indian elections |
+| **Myth vs Fact Education** | Corrects common misconceptions about voting |
+| **Quick / Detail Response Modes** | `/quick` for concise answers, `/detail` for in-depth explanations |
+| **Context-Aware Conversation** | Maintains the last 2 exchanges for accurate follow-up handling |
+| **Lightweight RAG Retrieval** | Retrieves relevant knowledge from the local JSON base before calling AI |
+| **Firestore Interaction Analytics** | Logs every query with mode, source, and timestamp for usage insights |
+| **Modern Lightweight UI** | Responsive chat interface with animated messages and suggestion prompts |
 
 ---
 
 ## AI Model
 
-ElectGuide-AI uses Google's Gemini API for advanced explanations.
+ElectGuide-AI integrates Google's **Gemini API** for generating explanations when a query falls outside the local intent engine.
 
 **Model used:**
-
 ```
 gemini-2.5-flash
 ```
 
-The assistant calls the Gemini REST endpoint only when a query cannot be answered by the local knowledge modules. This design ensures fast responses and minimal API usage.
+The assistant prioritises deterministic responses from its knowledge modules and only calls Gemini when necessary. This hybrid approach ensures:
+
+- ⚡ Fast responses for common queries
+- 💰 Reduced API usage and cost
+- ✅ Reliable information grounded in the structured knowledge base
 
 ---
 
 ## Architecture
 
+The assistant uses a **hybrid architecture** combining rule-based logic and AI reasoning:
+
 ```
 User
-↓
-Chat Interface (Vanilla HTML/CSS/JS)
-↓
-Intent Engine
-↓
-Election Knowledge Modules
-↓
-Gemini REST API (fallback for complex queries)
+ ↓
+Chat Interface (Vanilla HTML / CSS / JS)
+ ↓
+Chat Controller (Express)
+ ↓
+Intent Engine  ──────────────────────────── (deterministic responses)
+ ↓
+Knowledge Retrieval (JSON-based RAG)  ────── (structured election data)
+ ↓
+Gemini AI Fallback  ─────────────────────── (complex / unmatched queries)
+ ↓
+Response returned to User
+ ↓
+Firestore Analytics Logging
 ```
+
+---
+
+## Google Cloud Integration
+
+ElectGuide-AI leverages multiple Google Cloud services:
+
+| Service | Usage |
+|---|---|
+| **Google Gemini API** | AI-powered explanations for complex queries |
+| **Cloud Run** | Serverless, scalable container deployment |
+| **Firestore** | Interaction analytics and query logging |
+| **Cloud Logging** | Application-level monitoring and diagnostics |
+
+### Firestore Schema
+
+Each interaction record stores:
+
+| Field | Description |
+|---|---|
+| `query` | The user's message |
+| `mode` | Response mode — `quick`, `detail`, or `normal` |
+| `source` | Response origin — `intent` (local) or `gemini` (AI) |
+| `timestamp` | UTC timestamp of the interaction |
 
 ---
 
@@ -75,16 +150,17 @@ Gemini REST API (fallback for complex queries)
 |---|---|
 | Frontend | Vanilla HTML, CSS, JavaScript |
 | Backend | Node.js + Express |
-| AI Integration | Google Gemini REST API |
-| Model | `gemini-2.5-flash` |
+| AI Integration | Google Gemini REST API (`gemini-2.5-flash`) |
+| Knowledge Base | JSON-structured election data |
+| Analytics Logging | Firestore |
 | Deployment | Google Cloud Run |
-| Containerization | Docker (Alpine-based) |
+| Containerisation | Docker (Alpine-based) |
 
 ---
 
 ## Example Demo Prompts
 
-Try these in the chat to explore the assistant:
+Try these in the chat interface to explore the assistant:
 
 ```
 demo
@@ -97,21 +173,58 @@ fact
 can someone vote twice
 ```
 
+### Response Mode Prefixes
+
+| Prefix | Behaviour |
+|---|---|
+| `/quick` | Returns a concise, single-paragraph answer |
+| `/detail` | Returns an in-depth, step-by-step explanation |
+
+**Examples:**
+```
+/quick what is EVM
+/detail explain election timeline
+```
+
 ---
 
 ## Running Locally
 
-```bash
-# Install dependencies
-npm install
+**1. Install dependencies:**
 
-# Start the server
+```bash
+npm install
+```
+
+**2. Configure environment (optional — enables AI fallback):**
+
+```bash
+cp .env.example .env
+# Add your GEMINI_API_KEY to .env
+```
+
+**3. Start the server:**
+
+```bash
 npm start
 ```
 
-Open: [http://localhost:8080](http://localhost:8080)
+**4. Open in your browser:**
 
-> **Note:** The assistant works without a Gemini API key using its built-in intent engine. Complex queries outside the knowledge base will show a graceful fallback message until the key is configured. Copy `.env.example` to `.env` and add your `GEMINI_API_KEY` to enable AI fallback.
+```
+http://localhost:8080
+```
+
+> **Note:** The assistant works fully without a Gemini API key using its built-in intent engine. Queries outside the knowledge base will show a graceful fallback message until the key is configured.
+
+---
+
+## Environment Variables
+
+| Variable | Required | Description |
+|---|---|---|
+| `GEMINI_API_KEY` | Optional | Google Gemini API key for AI fallback responses |
+| `PORT` | Optional | Port to listen on (default: `8080`) |
 
 ---
 
@@ -126,10 +239,10 @@ The test suite covers **24 test cases** including:
 - Election timeline intent detection
 - Polling booth finder intent
 - Candidate information intent
-- Voter eligibility checker (general, underage, eligible, unregistered)
-- FAQ responses (NOTA, VVPAT, vote counting, EVM)
+- Voter eligibility checker — general, underage, eligible, and unregistered cases
+- FAQ responses — NOTA, VVPAT, vote counting, EVM
 - Voting preparation and polling day process intents
-- Follow-up context queries (generic and step-specific)
+- Follow-up context queries — generic and step-specific
 - Demo and help commands
 - Election facts command
 - Unmatched query handling
@@ -138,7 +251,7 @@ The test suite covers **24 test cases** including:
 
 ## Cloud Run Deployment
 
-**Step 1 — Build and push the container:**
+**Step 1 — Build and push the container image:**
 
 ```bash
 gcloud builds submit --tag gcr.io/PROJECT_ID/electguide-ai
@@ -157,16 +270,7 @@ gcloud run deploy electguide-ai \
 
 Replace `PROJECT_ID` with your Google Cloud project ID and `YOUR_KEY` with your Gemini API key.
 
-The service listens on `process.env.PORT` (Cloud Run injects this automatically, defaulting to `8080`).
-
----
-
-## Environment Variables
-
-| Variable | Required | Description |
-|---|---|---|
-| `GEMINI_API_KEY` | Optional | Google Gemini API key for complex query fallback |
-| `PORT` | Optional | Port to listen on (default: `8080`) |
+The service listens on `process.env.PORT`, which Cloud Run injects automatically (defaulting to `8080`).
 
 ---
 
@@ -176,23 +280,31 @@ The service listens on `process.env.PORT` (Cloud Run injects this automatically,
 electguide-ai/
 │
 ├── public/
-│   ├── index.html          # Chat UI
-│   ├── style.css           # Styles and animations
-│   └── script.js           # Frontend logic, typing effect, suggestions
+│   ├── index.html              # Chat UI
+│   ├── style.css               # Styles and animations
+│   └── script.js               # Frontend logic, typing effect, suggestion prompts
 │
 ├── src/
 │   ├── controllers/
-│   │   └── chat.controller.js   # Request handler, conversation context memory
+│   │   └── chat.controller.js  # Request handler + conversation context memory
 │   ├── routes/
-│   │   └── chat.routes.js       # Express router
+│   │   └── chat.routes.js      # Express router
 │   ├── services/
-│   │   ├── intent.service.js    # Intent detection + eligibility checker
-│   │   └── gemini.service.js    # Gemini REST API fallback
+│   │   ├── intent.service.js   # Intent detection + voter eligibility checker
+│   │   ├── gemini.service.js   # Gemini REST API fallback
+│   │   └── analytics.service.js # Firestore interaction logging
 │   └── data/
-│       └── election_knowledge.json  # Local knowledge base
+│       └── election_knowledge.json  # Local structured knowledge base
 │
 ├── tests/
-│   └── intent.test.js      # 24 automated test assertions
+│   └── intent.test.js          # 24 automated test assertions
+│
+├── docs/
+│   └── screenshots/            # README screenshots
+│       ├── main-interface.png
+│       ├── quick-mode.png
+│       ├── detail-mode.png
+│       └── firestore-analytics.png
 │
 ├── Dockerfile
 ├── .dockerignore
@@ -206,10 +318,17 @@ electguide-ai/
 
 ## Repository Constraints
 
-This project intentionally uses a lightweight architecture without heavy frameworks to stay within the **10MB repository size limit** required for the challenge:
+This project intentionally uses a lightweight architecture to stay within the **10 MB repository size limit** required for the challenge:
 
 - No React, Vue, or frontend frameworks
 - No UI component libraries
 - No heavy build tooling
 - All styling is vanilla CSS
 - `node_modules` is excluded from the repository
+- JSON-based knowledge retrieval instead of large vector databases
+
+---
+
+## Project Goal
+
+ElectGuide-AI demonstrates how a **lightweight AI system** can combine structured knowledge, conversational reasoning, and cloud infrastructure to create an accessible civic education tool — making election information available to every citizen, simply and reliably.
