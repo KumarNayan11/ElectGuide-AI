@@ -3,19 +3,29 @@
 /* =========================================================
    DOM references
    ========================================================= */
-const chatForm   = document.getElementById('chat-form');
-const userInput  = document.getElementById('user-input');
-const chatBox    = document.getElementById('chat-box');
-const sendBtn    = document.getElementById('send-btn');
-const modeHint   = document.getElementById('mode-hint');
-const modePill   = document.getElementById('mode-pill');
+const chatForm = document.getElementById('chat-form');
+const userInput = document.getElementById('user-input');
+const chatBox = document.getElementById('chat-box');
+const sendBtn = document.getElementById('send-btn');
+const stopBtn = document.getElementById('stop-btn');
+const modeHint = document.getElementById('mode-hint');
+const modePill = document.getElementById('mode-pill');
 const menuToggle = document.getElementById('menu-toggle');
-const sidebar    = document.querySelector('.sidebar');
+const sidebar = document.querySelector('.sidebar');
 
 /* =========================================================
    Mode state  ("normal" | "quick" | "detail")
    ========================================================= */
 let activeMode = 'normal';
+let currentAbortController = null;
+
+if (stopBtn) {
+    stopBtn.addEventListener('click', () => {
+        if (currentAbortController) {
+            currentAbortController.abort();
+        }
+    });
+}
 
 function setMode(mode) {
     if (activeMode === mode) {
@@ -77,7 +87,7 @@ async function sendMessage() {
 
     // Prefix based on active mode
     let messageToSend = rawMessage;
-    if (activeMode === 'quick')  messageToSend = `/quick ${rawMessage}`;
+    if (activeMode === 'quick') messageToSend = `/quick ${rawMessage}`;
     if (activeMode === 'detail') messageToSend = `/detail ${rawMessage}`;
 
     // Show user bubble with the raw (un-prefixed) text
@@ -86,7 +96,10 @@ async function sendMessage() {
 
     // Lock UI
     userInput.disabled = true;
-    sendBtn.disabled   = true;
+    sendBtn.style.display = 'none';
+    stopBtn.style.display = 'flex';
+
+    currentAbortController = new AbortController();
 
     // Typing indicator
     const typingId = showTypingIndicator();
@@ -95,7 +108,8 @@ async function sendMessage() {
         const response = await fetch('/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: messageToSend })
+            body: JSON.stringify({ message: messageToSend }),
+            signal: currentAbortController.signal
         });
 
         const data = await response.json();
@@ -109,13 +123,20 @@ async function sendMessage() {
 
         rotateSuggestions();
 
-    } catch {
+    } catch (err) {
         removeElement(typingId);
-        await appendMessage('bot', 'Sorry, I am unable to connect to the server right now.');
+        if (err.name === 'AbortError') {
+            currentAbortController = null;
+            await appendMessage('bot', 'Generation stopped.');
+        } else {
+            await appendMessage('bot', 'Sorry, I am unable to connect to the server right now.');
+        }
     } finally {
         userInput.disabled = false;
-        sendBtn.disabled   = false;
+        sendBtn.style.display = 'flex';
+        stopBtn.style.display = 'none';
         userInput.focus();
+        currentAbortController = null;
     }
 }
 
@@ -177,17 +198,20 @@ async function appendMessage(sender, text) {
         // Basic markdown: bold, italic, line breaks
         formattedText = String(text)
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\*(.*?)\*/g,     '<em>$1</em>')
-            .replace(/\n/g,            '<br>');
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            .replace(/\n/g, '<br>');
     }
 
     messageDiv.innerHTML = `
-        ${
-            sender === 'bot'
-                ? `<div class="bot-avatar"><i class="fa-solid fa-robot"></i></div>`
-                : `<div class="avatar"><i class="fa-solid fa-user"></i></div>`
+        ${sender === 'bot'
+            ? `<div class="bot-avatar"><i class="fa-solid fa-robot"></i></div>`
+            : `<div class="avatar"><i class="fa-solid fa-user"></i></div>`
         }
         <div class="message-content"></div>
+        ${sender === 'bot'
+            ? `<button class="copy-btn" title="Copy response" onclick="copyToClipboard(this)"><i class="fa-regular fa-copy"></i></button>`
+            : ''
+        }
     `;
 
     chatBox.appendChild(messageDiv);
@@ -211,26 +235,35 @@ async function typeWriterEffect(element, htmlString) {
     tempDiv.innerHTML = htmlString;
     element.innerHTML = '';
 
+    const totalLength = tempDiv.textContent.length || 1;
+    const charsPerFrame = Math.max(1, Math.ceil(totalLength / 150));
+
     async function typeNode(node, parent) {
+        if (currentAbortController && currentAbortController.signal.aborted) return;
+
         if (node.nodeType === Node.TEXT_NODE) {
             const text = node.textContent;
             const textNode = document.createTextNode('');
             parent.appendChild(textNode);
-            for (let i = 0; i < text.length; i++) {
-                textNode.textContent += text.charAt(i);
+
+            for (let i = 0; i < text.length; i += charsPerFrame) {
+                if (currentAbortController && currentAbortController.signal.aborted) return;
+                textNode.textContent += text.substring(i, i + charsPerFrame);
                 autoScroll();
-                await new Promise(r => setTimeout(r, 14));
+                await new Promise(r => requestAnimationFrame(r));
             }
         } else if (node.nodeType === Node.ELEMENT_NODE) {
             const clone = node.cloneNode(false);
             parent.appendChild(clone);
             for (const child of Array.from(node.childNodes)) {
+                if (currentAbortController && currentAbortController.signal.aborted) return;
                 await typeNode(child, clone);
             }
         }
     }
 
     for (const node of Array.from(tempDiv.childNodes)) {
+        if (currentAbortController && currentAbortController.signal.aborted) break;
         await typeNode(node, element);
     }
 }
@@ -250,7 +283,7 @@ function showTypingIndicator() {
             <span class="typing-dot"></span>
             <span class="typing-dot"></span>
             <span class="typing-dot"></span>
-            <span class="typing-label">ElectGuide AI is thinking…</span>
+            <span class="typing-label">Generating response…</span>
         </div>
     `;
 
@@ -312,6 +345,17 @@ function rotateSuggestions() {
 /* =========================================================
    Init
    ========================================================= */
+function copyToClipboard(btn) {
+    const messageContent = btn.parentElement.querySelector('.message-content').innerText;
+    navigator.clipboard.writeText(messageContent).then(() => {
+        const icon = btn.querySelector('i');
+        icon.className = 'fa-solid fa-check';
+        setTimeout(() => icon.className = 'fa-regular fa-copy', 2000);
+    }).catch(err => {
+        console.error('Failed to copy: ', err);
+    });
+}
+
 window.addEventListener('DOMContentLoaded', () => {
     rotateSuggestions();
 });

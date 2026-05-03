@@ -57,7 +57,7 @@ Many citizens lack clear knowledge about election procedures, voter eligibility,
 
 ---
 
-## Key Features
+## Features
 
 | Feature | Description |
 |---|---|
@@ -96,7 +96,7 @@ The assistant prioritises deterministic responses from its knowledge modules and
 
 ---
 
-## Architecture
+## Architecture / How it works
 
 The assistant uses a **hybrid architecture** combining rule-based logic and AI reasoning:
 
@@ -249,7 +249,7 @@ The test suite covers **24 test cases** including:
 
 ---
 
-## Cloud Run Deployment
+## Deployment (Google Cloud Run)
 
 **Step 1 — Build and push the container image:**
 
@@ -328,6 +328,12 @@ This project intentionally uses a lightweight architecture to stay within the **
 - JSON-based knowledge retrieval instead of large vector databases
 
 ---
+
+## Future Improvements
+
+- **Multilingual Support**: Add support for regional Indian languages (Hindi, Bengali, Tamil, etc.).
+- **Voice Input**: Enable voice commands for users less comfortable with typing.
+- **Real-Time Data**: Integrate live election results and candidate data during polling phases.
 
 ## Project Goal
 
