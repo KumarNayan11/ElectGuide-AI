@@ -182,7 +182,7 @@ can someone vote twice
 
 **Examples:**
 ```
-/quick what is EVM
+/quick What is an EVM machine ?
 /detail explain election timeline
 ```
 
