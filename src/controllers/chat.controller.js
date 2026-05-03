@@ -73,12 +73,14 @@ exports.handleChat = async (req, res) => {
 
         const intentResponse = intentService.detectIntent(userMessage);
 
-        // Treat empty string / empty array as a cache miss — fall through to Gemini
+        // Treat falsy / empty string / empty array / empty object as a cache miss — fall through to Gemini
         const intentIsEmpty =
+            !intentResponse ||
             (typeof intentResponse === 'string' && intentResponse.trim() === '') ||
-            (Array.isArray(intentResponse) && intentResponse.length === 0);
+            (Array.isArray(intentResponse) && intentResponse.length === 0) ||
+            (typeof intentResponse === 'object' && Object.keys(intentResponse).length === 0);
 
-        if (intentResponse && !intentIsEmpty) {
+        if (!intentIsEmpty) {
 
             const responseText =
                 typeof intentResponse === 'string'
