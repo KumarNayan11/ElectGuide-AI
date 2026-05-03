@@ -3,7 +3,8 @@
 const { Firestore } = require('@google-cloud/firestore');
 
 const firestore = new Firestore({
-    projectId: process.env.GOOGLE_CLOUD_PROJECT || 'electguide-ai'
+    projectId: 'electguide-ai',
+    databaseId: 'electguide-ai'
 });
 
 const COLLECTION = 'electguide_queries';
@@ -22,7 +23,7 @@ async function logQuery(query, mode, source) {
             query,
             mode,
             source,
-            timestamp: new Date()
+            timestamp: Firestore.Timestamp.now()
         });
     } catch (err) {
         console.error('[ElectGuide-AI] Firestore logging failed:', err.message);
